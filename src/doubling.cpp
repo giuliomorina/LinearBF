@@ -64,8 +64,9 @@ int find_n0(const double eps) {
 }
 
 // [[Rcpp::export]]
-int doubling_alg(SEXP toss_coin_func, const double eps, 
-                 int n0 = -1, const int max_iter = -1) {
+int doubling_alg(float p, const double eps, 
+                 int n0 = -1, const int max_iter = -1,
+                 const double verbose = false) {
   if(eps >= 1.0/8) {
     stop("eps must be smaller than 1/8.");
   }
@@ -73,11 +74,10 @@ int doubling_alg(SEXP toss_coin_func, const double eps,
     //Find minimum n0 such that alpha and beta are always in [0,1]
     warning("Prespecifying n0 can speed up the code if the function is reused.");
     n0 = find_n0(eps);
+    if(verbose) Rcout << "Value of n0:" << n0 << "\n";
   }
   
-  //Get the R function to toss a coin
-  Rcpp::Function fn_toss_coin = Rcpp::as<Rcpp::Function>(toss_coin_func);
-  
+  NumericVector probs = NumericVector::create(p,1.0-p);
   NumericVector G = runif(1,0,1);
   NumericVector L(1, -9.0), U(1, -9.0);
   NumericVector L_tilde(1, -9.0), U_tilde(1, -9.0);
@@ -100,7 +100,8 @@ int doubling_alg(SEXP toss_coin_func, const double eps,
   iter = 1;
   while(true && (max_iter <= 0 || iter <= max_iter)) {
     //Toss coin
-    NumericVector tossed_coins = Rcpp::as<NumericVector>(fn_toss_coin(n-n_prev));
+    NumericVector tossed_coins = Rcpp::as<NumericVector>(Rcpp::sample(2, n-n_prev, true, probs));
+
     if(iter == 1) {
       H[0] = 0;
     } else {
@@ -142,6 +143,9 @@ int doubling_alg(SEXP toss_coin_func, const double eps,
     //Update results
     H_prev[0] = H[0];
     diff_tilde_prev[0] = diff_tilde[0];
+    // Verbose
+    if(verbose) Rcout << "Iteration #" << iter << ", U = " << G <<
+      ", Interval: [" << L_tilde[0] << ", " << U_tilde[0] << "]\n";
     //Check final result
     if(G[0] <= L_tilde[0]) {
       return(1);

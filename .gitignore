@@ -37,3 +37,6 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+DoublingBF.Rcheck/
+DoublingBF*.tar.gz
+DoublingBF*.tgz

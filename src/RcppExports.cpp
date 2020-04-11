@@ -5,19 +5,108 @@
 
 using namespace Rcpp;
 
-// rcpp_hello_world
-List rcpp_hello_world();
-RcppExport SEXP _DoublingBF_rcpp_hello_world() {
+// alpha_cpp
+double alpha_cpp(const int n, const int k, const double eps);
+RcppExport SEXP _DoublingBF_alpha_cpp(SEXP nSEXP, SEXP kSEXP, SEXP epsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcpp_hello_world());
+    Rcpp::traits::input_parameter< const int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< const double >::type eps(epsSEXP);
+    rcpp_result_gen = Rcpp::wrap(alpha_cpp(n, k, eps));
+    return rcpp_result_gen;
+END_RCPP
+}
+// beta_cpp
+double beta_cpp(const int n, const int k, const double eps);
+RcppExport SEXP _DoublingBF_beta_cpp(SEXP nSEXP, SEXP kSEXP, SEXP epsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< const double >::type eps(epsSEXP);
+    rcpp_result_gen = Rcpp::wrap(beta_cpp(n, k, eps));
+    return rcpp_result_gen;
+END_RCPP
+}
+// hypergeom_mean
+double hypergeom_mean(const NumericVector m, const NumericVector n, const NumericVector Hn, const double eps, bool compute_a);
+RcppExport SEXP _DoublingBF_hypergeom_mean(SEXP mSEXP, SEXP nSEXP, SEXP HnSEXP, SEXP epsSEXP, SEXP compute_aSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector >::type m(mSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type Hn(HnSEXP);
+    Rcpp::traits::input_parameter< const double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< bool >::type compute_a(compute_aSEXP);
+    rcpp_result_gen = Rcpp::wrap(hypergeom_mean(m, n, Hn, eps, compute_a));
+    return rcpp_result_gen;
+END_RCPP
+}
+// find_n0
+int find_n0(const double eps);
+RcppExport SEXP _DoublingBF_find_n0(SEXP epsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const double >::type eps(epsSEXP);
+    rcpp_result_gen = Rcpp::wrap(find_n0(eps));
+    return rcpp_result_gen;
+END_RCPP
+}
+// doubling_alg
+int doubling_alg(float p, const double eps, int n0, const int max_iter, const double verbose);
+RcppExport SEXP _DoublingBF_doubling_alg(SEXP pSEXP, SEXP epsSEXP, SEXP n0SEXP, SEXP max_iterSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< float >::type p(pSEXP);
+    Rcpp::traits::input_parameter< const double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< int >::type n0(n0SEXP);
+    Rcpp::traits::input_parameter< const int >::type max_iter(max_iterSEXP);
+    Rcpp::traits::input_parameter< const double >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(doubling_alg(p, eps, n0, max_iter, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// logistic_cpp
+Rcpp::List logistic_cpp(float C, float p);
+RcppExport SEXP _DoublingBF_logistic_cpp(SEXP CSEXP, SEXP pSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< float >::type C(CSEXP);
+    Rcpp::traits::input_parameter< float >::type p(pSEXP);
+    rcpp_result_gen = Rcpp::wrap(logistic_cpp(C, p));
+    return rcpp_result_gen;
+END_RCPP
+}
+// doubling_Huber_2019_iter_cpp
+Rcpp::List doubling_Huber_2019_iter_cpp(float C, int i, float eps, float p);
+RcppExport SEXP _DoublingBF_doubling_Huber_2019_iter_cpp(SEXP CSEXP, SEXP iSEXP, SEXP epsSEXP, SEXP pSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< float >::type C(CSEXP);
+    Rcpp::traits::input_parameter< int >::type i(iSEXP);
+    Rcpp::traits::input_parameter< float >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< float >::type p(pSEXP);
+    rcpp_result_gen = Rcpp::wrap(doubling_Huber_2019_iter_cpp(C, i, eps, p));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_DoublingBF_rcpp_hello_world", (DL_FUNC) &_DoublingBF_rcpp_hello_world, 0},
+    {"_DoublingBF_alpha_cpp", (DL_FUNC) &_DoublingBF_alpha_cpp, 3},
+    {"_DoublingBF_beta_cpp", (DL_FUNC) &_DoublingBF_beta_cpp, 3},
+    {"_DoublingBF_hypergeom_mean", (DL_FUNC) &_DoublingBF_hypergeom_mean, 5},
+    {"_DoublingBF_find_n0", (DL_FUNC) &_DoublingBF_find_n0, 1},
+    {"_DoublingBF_doubling_alg", (DL_FUNC) &_DoublingBF_doubling_alg, 5},
+    {"_DoublingBF_logistic_cpp", (DL_FUNC) &_DoublingBF_logistic_cpp, 2},
+    {"_DoublingBF_doubling_Huber_2019_iter_cpp", (DL_FUNC) &_DoublingBF_doubling_Huber_2019_iter_cpp, 4},
     {NULL, NULL, 0}
 };
 
