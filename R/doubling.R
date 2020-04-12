@@ -130,10 +130,33 @@ doubling_Huber_2017 <- function() {
   # Small Mean Problems" by M. Huber (2017).
 }
 
-small_doubling_Huber_2017 <- function() {
-  # f(p) = Cp, for Cp <= M < 1/2
+small_doubling_Huber_2017 <- function(n, C, M, p, as_list=F) {
+  # f(p) = Cp, for Cp <= M < 1/2, with known constant M
   # The function is taken from "Optimal Linear Bernoulli Factories for 
   # Small Mean Problems" by M. Huber (2017).
+  res_list <- lapply(1:n, function(iter) {
+    num_tosses <- 0
+    beta <- 1/(1-2*M)
+    aux <- logistic(n=1,C=beta*C,p=p, as_list = T)[[1]]
+    num_tosses <- num_tosses + aux$num_tosses
+    Y <- aux$res
+    B <- sample(c(1,0), size=1, prob=c(1/beta, 1-1/beta))
+    if(Y != 1) {
+      res <- 0
+    } else if(Y==1 && B==1) {
+      res <- 1
+    } else {
+      aux2 <- doubling_Huber_2014(n=1,C=beta*C/(beta-1), eps=1-M, p=p, as_list=T)[[1]]
+      res <- aux2$res
+      num_tosses <- aux2$num_tosses
+    }
+    return(list(res=res, num_tosses=num_tosses))
+  })
+  if (as_list) {
+    return(res_list)
+  } else {
+    return(list_to_matrix(res_list))
+  }
 }
 
 doubling_Huber_2014 <- function(n, C, eps, p, as_list=F) {
