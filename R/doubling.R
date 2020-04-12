@@ -130,10 +130,49 @@ doubling_Huber_2017 <- function() {
   # Small Mean Problems" by M. Huber (2017).
 }
 
-doubling_Huber_2014 <- function() {
+small_doubling_Huber_2017 <- function() {
+  # f(p) = Cp, for Cp <= M < 1/2
+  # The function is taken from "Optimal Linear Bernoulli Factories for 
+  # Small Mean Problems" by M. Huber (2017).
+}
+
+doubling_Huber_2014 <- function(n, C, eps, p, as_list=F) {
   # f(p) = Cp, for Cp < 1-eps
   # The function is taken from "Nearly optimal Bernoulli factories for 
   # linear functions" by M. Huber (2014).
+  res_list <- lapply(1:n, function(iter) {
+    num_tosses <- 0
+    gamma <- 0.5
+    k <- 2.3/(gamma*eps)
+    i <- 1
+    eps <- min(eps, 0.644)
+    R <- 1
+    while(i > 0 && R==1) {
+      while(i > 0 && i < k) {
+        B <- sample(c(1,0), size = 1, prob = c(p,1-p))
+        num_tosses <- num_tosses + 1
+        G <- rgeom(n = 1, prob = (C-1)/C) + 1 #Starting from 1
+        i <- i-1+(1-B)*G
+      }
+      if(i >= k) {
+        R <- sample(c(1,0), size = 1, prob=c((1+gamma*eps)^(-i), 1-(1+gamma*eps)^(-i)))
+        C <- C*(1+gamma*eps)
+        eps <- (1-gamma)*eps
+        k <- k/(1-gamma)
+      }
+    }
+    if(i == 0) {
+      res <- 1
+    } else {
+      res <- 0
+    }
+    return(list(res=res, num_tosses=num_tosses))
+  })
+  if (as_list) {
+    return(res_list)
+  } else {
+    return(list_to_matrix(res_list))
+  }
 }
 
 doubling_Thomas_2018_Nacu_Peres <- function() {
