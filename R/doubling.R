@@ -122,4 +122,30 @@ doubling_Huber_2019_iter <-
   } else {
     return(list_to_matrix(res_list))
   }
+  }
+
+doubling_Huber_2017 <- function() {
+  # f(p) = Cp, for Cp < 1-eps
+  # The function is taken from "Optimal Linear Bernoulli Factories for 
+  # Small Mean Problems" by M. Huber (2017).
+}
+
+doubling_Huber_2014 <- function() {
+  # f(p) = Cp, for Cp < 1-eps
+  # The function is taken from "Nearly optimal Bernoulli factories for 
+  # linear functions" by M. Huber (2014).
+}
+
+doubling_Thomas_2018_Nacu_Peres <- function() {
+  # f(p) = ???
+  # The function is taken from "A Practical Implementation of the
+  # Bernoulli Factory", which makes use of Latuszynski envelope method
+  # and the envelopes provided by Nacu-Peres for twice differentiable functions
+}
+
+doubling_Thomas_2018_New_Envelopes <- function() {
+  # f(p) = ???
+  # The function is taken from "A Practical Implementation of the
+  # Bernoulli Factory", which makes use of Latuszynski envelope method
+  # and the new envelopes proposed for twice differentiable functions
 }
