@@ -124,13 +124,94 @@ doubling_Huber_2019_iter <-
   }
   }
 
-doubling_Huber_2017 <- function() {
+doubling_Huber_2017 <- function(n, C, eps, p, as_list=F) {
   # f(p) = Cp, for Cp < 1-eps
   # The function is taken from "Optimal Linear Bernoulli Factories for 
   # Small Mean Problems" by M. Huber (2017).
+  
+  # Define auxiliary functions
+  A_func <- function(m,C,p) {
+    s <- 1
+    num_tosses <- 0
+    while(s > 0 && s < m) {
+      aux <- logistic(n=1, C=C, p=p, as_list = T)[[1]]
+      num_tosses <- num_tosses+aux$num_tosses
+      B <- aux$res
+      s <- s-2*B+1
+    }
+    if(s == 0) {
+      res <- 1
+    } else {
+      res <- 0
+    }
+    return(list(res=res, num_tosses=num_tosses))
+  }
+  High_Power_Logistic_BF <- function(m, beta, C, p) {
+    s <- 1
+    num_tosses <- 0
+    while(s > 0 && s <= m) {
+      aux <- logistic(n=1, C=beta*C, p=p, as_list = T)[[1]]
+      num_tosses <- num_tosses+aux$num_tosses
+      B <- aux$res
+      s <- s-2*B-1
+    }
+    if(s == m+1) {
+      res <- 1
+    } else {
+      res <- 0
+    }
+    return(list(res=res, num_tosses=num_tosses))
+  }
+  B_func <- function(eps, m, beta, C, p) {
+    res <- -1
+    num_tosses <- 0
+    while(res == -1) {
+      aux <- doubling_Huber_2017(n=1, C=beta*C, eps=1-(1-eps)*beta, p=p, as_list=T)[[1]]
+      B1 <- aux$res
+      num_tosses <- num_tosses + aux$num_tosses
+      if(B1 == 0) {
+        res <- 0
+      } else {
+        aux2 <- High_Power_Logistic_BF(m=m-2, beta=beta, C=C, p=p)
+        B2 <- aux2$res
+        num_tosses <- num_tosses + aux2$num_tosses
+        if(B2 == 1) {
+          res <- 1
+        } else {
+          m <- m-1
+        }
+      }
+    }
+    return(list(res=res, num_tosses=num_tosses))
+  }
+  # Main function
+  res_list <- lapply(1:n, function(iter) {
+    m <- ceiling(4.5/eps)+1
+    beta <- 1+1/(m-1)
+    B1 <- A_func(m, beta*C, p)
+    num_tosses <- B1$num_tosses
+    if(B1$res == 1) {
+      B2 <- sample(c(1,0), size=1, prob=c(1/beta,1-1/beta))
+      if(B2 == 1) {
+        res <- 1
+      } else {
+        aux <- B_func(eps, m, beta, C, p)
+        res <- aux$res
+        num_tosses <- num_tosses + aux$num_tosses
+      }
+    } else {
+      res <- 0
+    }
+    return(list(res=res, num_tosses = num_tosses))
+  })
+  if (as_list) {
+    return(res_list)
+  } else {
+    return(list_to_matrix(res_list))
+  }
 }
 
-small_doubling_Huber_2017 <- function(n, C, M, p, as_list=F) {
+small_doubling_Huber_2017 <- function(n, C, M, p, as_list=F, doubling_bf=doubling_Huber_2017) {
   # f(p) = Cp, for Cp <= M < 1/2, with known constant M
   # The function is taken from "Optimal Linear Bernoulli Factories for 
   # Small Mean Problems" by M. Huber (2017).
@@ -146,7 +227,7 @@ small_doubling_Huber_2017 <- function(n, C, M, p, as_list=F) {
     } else if(Y==1 && B==1) {
       res <- 1
     } else {
-      aux2 <- doubling_Huber_2014(n=1,C=beta*C/(beta-1), eps=1-M, p=p, as_list=T)[[1]]
+      aux2 <- doubling_bf(n=1,C=beta*C/(beta-1), eps=1-M, p=p, as_list=T)[[1]]
       res <- aux2$res
       num_tosses <- aux2$num_tosses
     }
