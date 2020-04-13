@@ -279,16 +279,28 @@ doubling_Huber_2014 <- function(n, C, eps, p, as_list=F) {
   }
 }
 
-doubling_Thomas_2018_Nacu_Peres <- function() {
-  # f(p) = ???
-  # The function is taken from "A Practical Implementation of the
-  # Bernoulli Factory", which makes use of Latuszynski envelope method
-  # and the envelopes provided by Nacu-Peres for twice differentiable functions
-}
-
-doubling_Thomas_2018_New_Envelopes <- function() {
-  # f(p) = ???
-  # The function is taken from "A Practical Implementation of the
-  # Bernoulli Factory", which makes use of Latuszynski envelope method
-  # and the new envelopes proposed for twice differentiable functions
+modified_doubling_func <- function(a, eps, delta=eps, p_seq) {
+  # This is a modified target function for a linear BF which is twice
+  # differentiable, as proposed by Flegal, Herbei (2012) in "Exact sampling
+  # for intractable probability distributions via a Bernoulli Factory".
+  # The function assume that a*p < 1-eps and fix delta such that 0<delta<omega
+  # It is then defined as:
+  # a*p                       if p \in [0,(1-eps)/a)
+  # (1-eps)+F(p-(1-eps)/a)    if p  in [(1-eps)/a,1]
+  # where F(p) is given by:
+  # F(p) = delta*\int_0^{a*p/delta} e^{-t^2} dt
+  int_et2 <- function(x) (pnorm(x, sd=sqrt(0.5)) - 1/2)*sqrt(pi) #integral of e^-t^2 from 0 to x
+  res <- numeric(length=length(p_seq))
+  i <- 1
+  for(p in p_seq) {
+    if(p >= 0 && p < (1-eps)/a) {
+      res[i] <- a*p
+    } else if(p <= 1) {
+      res[i] <- (1-eps) + delta*int_et2(a*(p-(1-eps)/a)/delta)
+    } else {
+      res[i] <- NA
+    }
+    i <- i+1
+  }
+  return(res)
 }
