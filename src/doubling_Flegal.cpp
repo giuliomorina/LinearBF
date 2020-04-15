@@ -38,6 +38,7 @@ double doubling_beta_Flegal_cpp(const int n, const int k,
   return(res);
 }
 
+// [[Rcpp::export]]
 double const_a_n_Flegal_Morina_cpp(const int n, const int k, const double eps,
                                    const double C) {
   // Compute constant bounding second derivative
@@ -51,6 +52,7 @@ double const_a_n_Flegal_Morina_cpp(const int n, const int k, const double eps,
   log_a_n -= log(norm_const);
   return(exp(log_a_n));
 }
+
 
 double doubling_alpha_Flegal_Morina_cpp(const int n, const int k, const double eps,
                                        const double C) {
