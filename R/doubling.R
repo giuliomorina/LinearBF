@@ -1,16 +1,24 @@
-doubling_Nacu <-
+doubling_Nacu_Peres <-
   function(n,
-           toss.coin,
            eps,
-           n0 = NULL,
+           p,
            max_iter = Inf,
-           verbose = F) {
+           verbose = F,
+           as_list = F) {
+    #f(p) = min(2p,1-2eps) from Nacu-Peres with Latuszynski envelope method
     if (is.infinite(max_iter)) {
       max_iter <- -1
     }
-    #f(p) = min(2p,1-2eps) from Nacu-Peres with Latuszynski envelope method
-    doubling_alg(toss.coin, eps, n0, max_iter, verbose)
-  }
+    n0 <- doubling_find_n0(eps)
+    res_list <- lapply(1:n, function(iter) {
+      doubling_Nacu_Peres_cpp(p=p,eps=eps,n0=n0,max_iter=max_iter,verbose=verbose)
+    })
+    if (as_list) {
+      return(res_list)
+    } else {
+      return(list_to_matrix(res_list))
+    }
+}
 
 list_to_matrix <- function(res_list) {
   res <-
@@ -279,28 +287,62 @@ doubling_Huber_2014 <- function(n, C, eps, p, as_list=F) {
   }
 }
 
-modified_doubling_func <- function(a, eps, delta=eps, p_seq) {
+modified_doubling_func <- function(C, eps, p_seq) {
   # This is a modified target function for a linear BF which is twice
   # differentiable, as proposed by Flegal, Herbei (2012) in "Exact sampling
   # for intractable probability distributions via a Bernoulli Factory".
-  # The function assume that a*p < 1-eps and fix delta such that 0<delta<omega
+  # The function assume that Cp < 1-eps and fix delta such that 0<delta<omega
   # It is then defined as:
-  # a*p                       if p \in [0,(1-eps)/a)
-  # (1-eps)+F(p-(1-eps)/a)    if p  in [(1-eps)/a,1]
+  # C*p                       if p \in [0,(1-eps)/a)
+  # (1-eps)+F(p-(1-eps)/C)    if p  in [(1-eps)/a,1]
   # where F(p) is given by:
-  # F(p) = delta*\int_0^{a*p/delta} e^{-t^2} dt
-  int_et2 <- function(x) (pnorm(x, sd=sqrt(0.5)) - 1/2)*sqrt(pi) #integral of e^-t^2 from 0 to x
-  res <- numeric(length=length(p_seq))
-  i <- 1
-  for(p in p_seq) {
-    if(p >= 0 && p < (1-eps)/a) {
-      res[i] <- a*p
-    } else if(p <= 1) {
-      res[i] <- (1-eps) + delta*int_et2(a*(p-(1-eps)/a)/delta)
-    } else {
-      res[i] <- NA
-    }
-    i <- i+1
-  }
-  return(res)
+  # F(p) = delta*\int_0^{C*p/delta} e^{-t^2} dt
+  sapply(p_seq, modified_double_func_cpp, C=C, eps=eps)
 }
+
+doubling_Flegal_Herbei <-
+  function(n,
+           C,
+           eps,
+           p,
+           max_iter = Inf,
+           verbose = F,
+           as_list = F) {
+    # Check modified_doubling_func
+    if (is.infinite(max_iter)) {
+      max_iter <- -1
+    }
+    n0 <- doubling_Flegal_find_n0(eps=eps,C=C)
+    res_list <- lapply(1:n, function(iter) {
+      doubling_Flegal_Herbei_cpp(p=p,eps=eps,C=C,n0=n0,max_iter=max_iter,verbose=verbose)
+    })
+    if (as_list) {
+      return(res_list)
+    } else {
+      return(list_to_matrix(res_list))
+    }
+  }
+
+doubling_Flegal_Herbei_Morina <-
+  function(n,
+           C,
+           eps,
+           p,
+           max_iter = Inf,
+           verbose = F,
+           as_list = F) {
+    # Check modified_doubling_func, using newly proposed envelopes
+    if (is.infinite(max_iter)) {
+      max_iter <- -1
+    }
+    n0 <- doubling_Flegal_Morina_find_n0(eps=eps,C=C)
+    res_list <- lapply(1:n, function(iter) {
+      doubling_Flegal_Herbei_Morina_cpp(p=p,eps=eps,C=C,n0=n0,max_iter=max_iter,verbose=verbose)
+    })
+    if (as_list) {
+      return(res_list)
+    } else {
+      return(list_to_matrix(res_list))
+    }
+  }
+

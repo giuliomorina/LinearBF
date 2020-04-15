@@ -1,79 +1,77 @@
 #include <Rcpp.h>
 #include <algorithm>
+#include "doubling_envelope.h"
 using namespace Rcpp;
 using namespace std;
 
-// [[Rcpp::export]]
-double alpha_cpp(const int n, const int k, const double eps) {
-  return(std::min(2*(double)k/n,1-2*eps));
+double alpha_beta_cpp(const int type, bool compute_a, 
+                      const int n, const int k, const double eps,
+                      const double C) {
+  switch(type) {
+  case 1:
+    // Doubling as in Nacu-Peres
+    if((int)C != 2) {
+      stop("The algorithm is valid only for C=2");
+    }
+    return(compute_a ? doubling_alpha_cpp(n,k,eps) : doubling_beta_cpp(n,k,eps));
+    break;
+  case 2:
+    // Doubling as in Flegal.Herbei
+    return(compute_a ? doubling_alpha_Flegal_cpp(n,k,eps,C) : doubling_beta_Flegal_cpp(n,k,eps,C));
+    break;
+  case 3:
+    // Doubling as in Flegal-Herbei with newly proposed envelopes
+    return(compute_a ? doubling_alpha_Flegal_Morina_cpp(n,k,eps,C) : doubling_beta_Flegal_Morina_cpp(n,k,eps,C));
+    break;
+  }
+  stop("Type not valid");
 }
 
-// [[Rcpp::export]]
-double beta_cpp(const int n, const int k, const double eps) {
-  double C1 = 1/((1-1.0/std::sqrt(2))*eps);
-  double C2 = 72/(1-exp(-2*(pow(eps,2))));
-  double res = alpha_cpp(n,k,eps);
-  double r1_aux = ((double)k/n-(0.5-3*eps));
-  double r2_aux = ((double)k/n-1.0/9);
-  if(r1_aux > 0) {
-    res += C1*r1_aux*sqrt(2.0/n);
-  }
-  if(r2_aux > 0) {
-    res += C2*r2_aux*exp(-2*pow(eps,2)*n);
-  }
-  return(res);
-}
-
-// [[Rcpp::export]]
 double hypergeom_mean(const NumericVector m, const NumericVector n, 
                       const NumericVector Hn, const double eps,
-                      bool compute_a) {
+                      const double C,
+                      const int type, const bool compute_a) {
   //Compute E[a(m,Hm)|Hn] where m < n and 
   //Hm|Hn is hypergeometric(n,m,Hn)
   // OR compute E[b(m,Hm)|Hn] (depdening on the value of compute_a)
   NumericVector res(1);
   for(int i=0; i<=Hn[0]; i++) {
-    if(compute_a) {
-      res[0] = res[0] + exp(lchoose(n-m,Hn-i)[0]+lchoose(m,i)[0]-lchoose(n,Hn)[0]+
-        log(alpha_cpp(m[0],i,eps)));
-    } else {
-      res[0] = res[0] + exp(lchoose(n-m,Hn-i)[0]+lchoose(m,i)[0]-lchoose(n,Hn)[0]+
-        log(beta_cpp(m[0],i,eps)));
-    }
+    res[0] = res[0] + exp(lchoose(n-m,Hn-i)[0]+lchoose(m,i)[0]-lchoose(n,Hn)[0]+
+      log(alpha_beta_cpp(type,compute_a,m[0],i,eps, C)));
   }
   return(res[0]);
 }
 
-// [[Rcpp::export]]
-int find_n0(const double eps) {
+int find_n0(const int type, const double eps, const double C, const bool double_n) {
   //Find the minimum n such that alpha(n,k) and beta(n,k)
-  //are always in [0,1]. Notice that alpha(n,k) is always in [0,1].
+  //are always in [0,1]. 
+  
   int n0 = 1, k;
-  bool greater_one = true;
-  while(greater_one) {
-    greater_one = false;
+  double alpha, beta;
+  bool not_found = true;
+  while(not_found) {
+    not_found = false;
     for(k=0; k<=n0; k++) {
-      if(beta_cpp(n0,k,eps) >1) {
-        greater_one = true;
+      alpha = alpha_beta_cpp(type,true,n0,k,eps,C);
+      beta = alpha_beta_cpp(type,false,n0,k,eps,C);
+      if(alpha < 0 || alpha > 1 || beta < 0 || beta > 1) {
+        not_found = true;
         break;
       }
     }
-    n0 = 2*n0; //Increase n0
+    n0 = double_n ? 2*n0 : n0+1; //Increase n0
   }
-  return(n0/2);
+  return(double_n ? n0/2 : n0-1);
 }
 
-// [[Rcpp::export]]
-int doubling_alg(float p, const double eps, 
+Rcpp::List envelope_alg(double p, const double eps, const double C, const int type,
                  int n0 = -1, const int max_iter = -1,
-                 const double verbose = false) {
-  if(eps >= 1.0/8) {
-    stop("eps must be smaller than 1/8.");
-  }
+                 const double verbose = false,
+                 const bool double_n = true) {
   if(n0 <= 0) {
     //Find minimum n0 such that alpha and beta are always in [0,1]
     warning("Prespecifying n0 can speed up the code if the function is reused.");
-    n0 = find_n0(eps);
+    n0 = find_n0(type, eps, C, double_n);
     if(verbose) Rcout << "Value of n0:" << n0 << "\n";
   }
   
@@ -85,8 +83,9 @@ int doubling_alg(float p, const double eps,
   NumericVector diff_tilde(1, -9.0), diff_tilde_prev(1, -9.0);
   NumericVector H(1, -9.0), H_prev(1, -9.0);
   NumericVector aux(1), aux2(1), aux3(1);
-  int n_prev, n; //Current and previous number of total tosses
+  int n_prev, n, num_tosses = 0; //Current, previous and total number of total tosses
   int iter = 0; //Number of iterations
+  int res = NA_INTEGER; //Final result
   
   //First iteration: n=0
   L[0] = 0; U[0] = 1;
@@ -101,7 +100,7 @@ int doubling_alg(float p, const double eps,
   while(true && (max_iter <= 0 || iter <= max_iter)) {
     //Toss coin
     NumericVector tossed_coins = Rcpp::as<NumericVector>(Rcpp::sample(2, n-n_prev, true, probs));
-
+    num_tosses += n-n_prev;
     if(iter == 1) {
       H[0] = 0;
     } else {
@@ -115,10 +114,10 @@ int doubling_alg(float p, const double eps,
     }
     
     //Compute L and U
-    L[0] = alpha_cpp(n,H[0],eps);
-    U[0] = beta_cpp(n,H[0],eps);
+    L[0] = alpha_beta_cpp(type,true,n,H[0],eps,C);
+    U[0] = alpha_beta_cpp(type,false,n,H[0],eps,C);
     //Safety check, L and U need to be in [0,1]
-    if(L[0] < 0 || U[0] < 0 || L[0] > 1 || U[0] > 1) {
+    if(L[0] < 0 || U[0] < 0 || L[0] > 1 || U[0] > 1 || U[0] < L[0]) {
       Rcout << n0 << " - " << H << " --> " << L << " - " << U << endl;
       stop("Invalid value for L and U. Increase the initial number of tosses.");
     }
@@ -129,8 +128,8 @@ int doubling_alg(float p, const double eps,
       U_star[0] = 1;
     } else {
       aux[0] = n_prev; aux2[0] = n, aux3[0] = H[0];
-      L_star[0] = hypergeom_mean(aux,aux2,aux3,eps,true);
-      U_star[0] = hypergeom_mean(aux,aux2,aux3,eps,false);
+      L_star[0] = hypergeom_mean(aux,aux2,aux3,eps,C,type,true);
+      U_star[0] = hypergeom_mean(aux,aux2,aux3,eps,C,type,false);
     }
     //Compute L_tilde and U_tilde
     if(abs(U_star[0] - L_star[0]) > 1e-16) {
@@ -145,16 +144,22 @@ int doubling_alg(float p, const double eps,
     diff_tilde_prev[0] = diff_tilde[0];
     // Verbose
     if(verbose) Rcout << "Iteration #" << iter << ", U = " << G <<
-      ", Interval: [" << L_tilde[0] << ", " << U_tilde[0] << "]\n";
+      ", Interval: [" << L_tilde[0] << ", " << U_tilde[0] << "], Value of L, U: " <<
+        L[0] << " - " << U[0] << " \n";
     //Check final result
     if(G[0] <= L_tilde[0]) {
-      return(1);
+      res = 1;
+      break;
     } else if(G[0] > U_tilde[0]) {
-      return(0);
+      res = 0;
+      break;
     }
     //Update n and number of iterations
-    n_prev = n; n *= 2; iter += 1;
+    n_prev = n; 
+    n = double_n ? 2*n : n+1; 
+    iter += 1;
   }
-  warning("Number maximum of iterations exceeded.");
-  return(NA_INTEGER);
+  if(max_iter > 0 && iter > max_iter) warning("Number maximum of iterations exceeded.");
+  return Rcpp::List::create(Rcpp::Named("res") = res,
+                            Rcpp::Named("num_tosses") = num_tosses);
 }
