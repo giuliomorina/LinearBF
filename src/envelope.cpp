@@ -144,8 +144,9 @@ Rcpp::List envelope_alg(double p, const double eps, const double C, const int ty
     diff_tilde_prev[0] = diff_tilde[0];
     // Verbose
     if(verbose) Rcout << "Iteration #" << iter << ", U = " << G <<
-      ", Interval: [" << L_tilde[0] << ", " << U_tilde[0] << "], Value of L, U: " <<
-        L[0] << " - " << U[0] << " \n";
+      ", Interval: [" << L[0] << ", " << U[0] << "]" <<
+      ", Interval star: [" << L_star[0] << ", " << U_star[0] << "]" <<
+      ", Interval tilde: [" << L_tilde[0] << ", " << U_tilde[0] << "] \n";
     //Check final result
     if(G[0] <= L_tilde[0]) {
       res = 1;
