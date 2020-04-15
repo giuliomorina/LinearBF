@@ -47,7 +47,7 @@ int find_n0(const int type, const double eps, const double C, const bool double_
   //are always in [0,1]. 
   
   int n0 = 1, k;
-  double a_n = const_a_n_Flegal_Morina_cpp(n0,k,eps,C,-9);
+  double a_n = const_a_n_Flegal_Morina_cpp(n0,-9,eps,C,-9);
   double alpha, beta;
   bool not_found = true;
   
