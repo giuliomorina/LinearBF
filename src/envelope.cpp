@@ -6,7 +6,7 @@ using namespace std;
 
 double alpha_beta_cpp(const int type, bool compute_a, 
                       const int n, const int k, const double eps,
-                      const double C) {
+                      const double C, const double a_n) {
   switch(type) {
   case 1:
     // Doubling as in Nacu-Peres
@@ -21,7 +21,7 @@ double alpha_beta_cpp(const int type, bool compute_a,
     break;
   case 3:
     // Doubling as in Flegal-Herbei with newly proposed envelopes
-    return(compute_a ? doubling_alpha_Flegal_Morina_cpp(n,k,eps,C) : doubling_beta_Flegal_Morina_cpp(n,k,eps,C));
+    return(compute_a ? doubling_alpha_Flegal_Morina_cpp(n,k,eps,C, a_n) : doubling_beta_Flegal_Morina_cpp(n,k,eps,C, a_n));
     break;
   }
   stop("Type not valid");
@@ -30,14 +30,14 @@ double alpha_beta_cpp(const int type, bool compute_a,
 double hypergeom_mean(const NumericVector m, const NumericVector n, 
                       const NumericVector Hn, const double eps,
                       const double C,
-                      const int type, const bool compute_a) {
+                      const int type, const bool compute_a, const double a_m) {
   //Compute E[a(m,Hm)|Hn] where m < n and 
   //Hm|Hn is hypergeometric(n,m,Hn)
   // OR compute E[b(m,Hm)|Hn] (depdening on the value of compute_a)
   NumericVector res(1);
   for(int i=0; i<=Hn[0]; i++) {
     res[0] = res[0] + exp(lchoose(n-m,Hn-i)[0]+lchoose(m,i)[0]-lchoose(n,Hn)[0]+
-      log(alpha_beta_cpp(type,compute_a,m[0],i,eps, C)));
+      log(alpha_beta_cpp(type,compute_a,m[0],i,eps, C, a_m)));
   }
   return(res[0]);
 }
@@ -47,19 +47,22 @@ int find_n0(const int type, const double eps, const double C, const bool double_
   //are always in [0,1]. 
   
   int n0 = 1, k;
+  double a_n = const_a_n_Flegal_Morina_cpp(n0,k,eps,C,-9);
   double alpha, beta;
   bool not_found = true;
+  
   while(not_found) {
     not_found = false;
     for(k=0; k<=n0; k++) {
-      alpha = alpha_beta_cpp(type,true,n0,k,eps,C);
-      beta = alpha_beta_cpp(type,false,n0,k,eps,C);
+      alpha = alpha_beta_cpp(type,true,n0,k,eps,C,a_n);
+      beta = alpha_beta_cpp(type,false,n0,k,eps,C,a_n);
       if(alpha < 0 || alpha > 1 || beta < 0 || beta > 1) {
         not_found = true;
         break;
       }
     }
     n0 = double_n ? 2*n0 : n0+1; //Increase n0
+    a_n = const_a_n_Flegal_Morina_cpp(n0,k,eps,C,a_n);
   }
   return(double_n ? n0/2 : n0-1);
 }
@@ -86,6 +89,8 @@ Rcpp::List envelope_alg(double p, const double eps, const double C, const int ty
   int n_prev, n, num_tosses = 0; //Current, previous and total number of total tosses
   int iter = 0; //Number of iterations
   int res = NA_INTEGER; //Final result
+  double a_n = const_a_n_Flegal_Morina_cpp(n0,-9,eps,C,-9); //Constants used for Flegal-Herbei-Morina
+  double a_m = -9;
   
   //First iteration: n=0
   L[0] = 0; U[0] = 1;
@@ -114,8 +119,8 @@ Rcpp::List envelope_alg(double p, const double eps, const double C, const int ty
     }
     
     //Compute L and U
-    L[0] = alpha_beta_cpp(type,true,n,H[0],eps,C);
-    U[0] = alpha_beta_cpp(type,false,n,H[0],eps,C);
+    L[0] = alpha_beta_cpp(type,true,n,H[0],eps,C,a_n);
+    U[0] = alpha_beta_cpp(type,false,n,H[0],eps,C,a_n);
     //Safety check, L and U need to be in [0,1]
     if(L[0] < 0 || U[0] < 0 || L[0] > 1 || U[0] > 1 || U[0] < L[0]) {
       Rcout << n0 << " - " << H << " --> " << L << " - " << U << endl;
@@ -128,8 +133,8 @@ Rcpp::List envelope_alg(double p, const double eps, const double C, const int ty
       U_star[0] = 1;
     } else {
       aux[0] = n_prev; aux2[0] = n, aux3[0] = H[0];
-      L_star[0] = hypergeom_mean(aux,aux2,aux3,eps,C,type,true);
-      U_star[0] = hypergeom_mean(aux,aux2,aux3,eps,C,type,false);
+      L_star[0] = hypergeom_mean(aux,aux2,aux3,eps,C,type,true, a_m);
+      U_star[0] = hypergeom_mean(aux,aux2,aux3,eps,C,type,false, a_m);
     }
     //Compute L_tilde and U_tilde
     if(abs(U_star[0] - L_star[0]) > 1e-16) {
@@ -143,7 +148,7 @@ Rcpp::List envelope_alg(double p, const double eps, const double C, const int ty
     H_prev[0] = H[0];
     diff_tilde_prev[0] = diff_tilde[0];
     // Verbose
-    if(verbose) Rcout << "Iteration #" << iter << ", U = " << G <<
+    if(verbose) Rcout << "Iteration #" << iter << ", n = " << n << ", U = " << G <<
       ", Interval: [" << L[0] << ", " << U[0] << "]" <<
       ", Interval star: [" << L_star[0] << ", " << U_star[0] << "]" <<
       ", Interval tilde: [" << L_tilde[0] << ", " << U_tilde[0] << "] \n";
@@ -159,6 +164,8 @@ Rcpp::List envelope_alg(double p, const double eps, const double C, const int ty
     n_prev = n; 
     n = double_n ? 2*n : n+1; 
     iter += 1;
+    a_m = a_n;
+    a_n = const_a_n_Flegal_Morina_cpp(n,H[0],eps,C,a_n);
   }
   if(max_iter > 0 && iter > max_iter) warning("Number maximum of iterations exceeded.");
   return Rcpp::List::create(Rcpp::Named("res") = res,

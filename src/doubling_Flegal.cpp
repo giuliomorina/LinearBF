@@ -38,34 +38,39 @@ double doubling_beta_Flegal_cpp(const int n, const int k,
   return(res);
 }
 
-// [[Rcpp::export]]
 double const_a_n_Flegal_Morina_cpp(const int n, const int k, const double eps,
-                                   const double C) {
+                                   const double C, const double a_n_m_1) {
   // Compute constant bounding second derivative
   double M = C*C*sqrt(2.0)/(eps*sqrt(M_E));
-  // Compute the coefficients a_n
-  double norm_const = sinh(M_PI*sqrt(M))/(sqrt(M)*M_PI);
-  double log_a_n = 0;
-  for(int j=2; j<=n; j++) {
-    log_a_n += log(1+M/pow((j-1),2));
+  // Compute coefficient a_2
+  if(n <= 1) {
+    return(-9.0);
   }
-  log_a_n -= log(norm_const);
+  if(n == 2) {
+    double norm_const = sinh(M_PI*sqrt(M))/(sqrt(M)*M_PI);
+    return((1.0+M)/norm_const);
+  }
+  if(a_n_m_1 <= 0 || a_n_m_1 > 1) {
+    stop("a_n_m_1 cannot be negative or greater than 1.");
+  }
+  // Compute the coefficient a_n = a_n_m_1 * (1+M/(n-1)^2)
+  double log_a_n = log(a_n_m_1) + log(1.0+M/pow((n-1),2));
   return(exp(log_a_n));
 }
 
 
 double doubling_alpha_Flegal_Morina_cpp(const int n, const int k, const double eps,
-                                       const double C) {
+                                       const double C, const double a_n) {
   // Compute the bound
-  double a_n = const_a_n_Flegal_Morina_cpp(n,k,eps,C);
+  if(n <= 1) return(0.0);
   double res = a_n*modified_double_func_cpp((double)k/n, C, eps);
   return(res);
 }
 
 double doubling_beta_Flegal_Morina_cpp(const int n, const int k, const double eps,
-                                       const double C) {
+                                       const double C, const double a_n) {
   // Compute the bound
-  double a_n = const_a_n_Flegal_Morina_cpp(n,k,eps,C);
+  if(n <= 1) return(1.0);
   double res = 1-a_n*modified_double_func_cpp((double)k/n, C, eps);
   return(res);
 }
