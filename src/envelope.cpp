@@ -89,7 +89,7 @@ Rcpp::List envelope_alg(double p, const double eps, const double C, const int ty
   int n_prev, n, num_tosses = 0; //Current, previous and total number of total tosses
   int iter = 0; //Number of iterations
   int res = NA_INTEGER; //Final result
-  double a_n = const_a_n_Flegal_Morina_cpp(n0,-9,eps,C,-9); //Constants used for Flegal-Herbei-Morina
+  double a_n = type == 3 ? const_a_n_Flegal_Morina_cpp(n0,-9,eps,C,-9) : -9; //Constants used for Flegal-Herbei-Morina
   double a_m = -9;
   
   //First iteration: n=0
@@ -165,7 +165,7 @@ Rcpp::List envelope_alg(double p, const double eps, const double C, const int ty
     n = double_n ? 2*n : n+1; 
     iter += 1;
     a_m = a_n;
-    a_n = const_a_n_Flegal_Morina_cpp(n,H[0],eps,C,a_n);
+    a_n = type == 3 ? const_a_n_Flegal_Morina_cpp(n,H[0],eps,C,a_n) : -9;
   }
   if(max_iter > 0 && iter > max_iter) warning("Number maximum of iterations exceeded.");
   return Rcpp::List::create(Rcpp::Named("res") = res,

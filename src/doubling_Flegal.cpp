@@ -71,7 +71,7 @@ double doubling_beta_Flegal_Morina_cpp(const int n, const int k, const double ep
                                        const double C, const double a_n) {
   // Compute the bound
   if(n <= 1) return(1.0);
-  double res = 1-a_n*modified_double_func_cpp((double)k/n, C, eps);
+  double res = 1-a_n*(1-modified_double_func_cpp((double)k/n, C, eps));
   return(res);
 }
 
