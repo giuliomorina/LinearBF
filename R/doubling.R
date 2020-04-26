@@ -344,5 +344,4 @@ doubling_Flegal_Herbei_Morina <-
     } else {
       return(list_to_matrix(res_list))
     }
-  }
-
+}

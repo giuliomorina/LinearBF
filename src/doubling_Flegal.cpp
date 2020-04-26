@@ -77,14 +77,14 @@ double doubling_beta_Flegal_Morina_cpp(const int n, const int k, const double ep
 
 // [[Rcpp::export]]
 int doubling_Flegal_find_n0(const double eps, const double C) {
-  return(find_n0(2,eps,C,false));
+  return(find_n0(2,eps,C,true));
 }
 
 // [[Rcpp::export]]
 Rcpp::List doubling_Flegal_Herbei_cpp(double p, const double eps, const double C,
                                    int n0 = -1, const int max_iter = -1,
                                    const double verbose = false) {
-  return(envelope_alg(p,eps,C,2,n0,max_iter,verbose,false));
+  return(envelope_alg(p,eps,C,2,n0,max_iter,verbose,true));
 }
 
 
