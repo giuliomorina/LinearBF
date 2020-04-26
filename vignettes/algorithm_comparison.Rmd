@@ -1,0 +1,116 @@
+---
+title: "algorithm_comparison"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{algorithm_comparison}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(DoublingBF)
+library(parallel)
+#p_seq <- c(0.001, 0.01, 0.1, 0.25, 0.4, 0.49, 0.499)
+#C_seq <- c(2,5,10,20,50)
+C_seq <- c(2)
+eps_seq <- c(0.5,0.1,0.01)
+n <- 100
+random_seed <- 17
+num_cores <- 2
+max_iter <- list("Nacu_Peres" = 10)
+```
+
+# Linear Bernoulli Factory - Algorithm comparison
+
+## Nacu-Peres (for C=2)
+
+Nacu-Peres proposes an algorith that targets $f(p) = \min(2p,1-\epsilon)$. The implementation becomes feasible when paired up with the envelope approach of Latuszynski et al.
+The envelopes are given by:
+$$
+\alpha(k,n) = f(k/n).
+$$
+$$
+\beta(k,n) = f(k/n)+ C_1(p-1/2+3\epsilon)_+\sqrt{2/n} + C_2(p-1/9)_+\exp(-2\epsilon^2n),
+$$
+where $C_1 = \epsilon^{-1}(1-1/\sqrt{2})^{-1}$, $C_2 = 72(1-\exp(-2\epsilon^2))^{-1}$. For the algorithm to be valid, $\epsilon$ must be smaller than $1/8$, it needs to be initialised with an initial number of tosses $n_0$ to ensure that $\beta(k,n) \in [0,1]$ for all $0\leq k \leq n$. Moreover, these functions are defined only for $n$ begin a power of 2. 
+
+Usually, the algorithm reaches a decision immediately bu just using the initial number of tosses. However, this number can be prohibitive. For instance, if $\epsilon = 1/8$ (the minimum possible for the algorithm to be valid) it requires $32,768$, while if $\epsilon = 0.01$ it requires $n_0 = 268,435,456$:
+
+```{r Nacu_Peres_n0}
+eps_seq <- c(0.49,0.4,0.25,0.1,0.01)
+res_n0 <- sapply(eps_seq, doubling_find_n0)
+```
+
+
+Nevertheless, the algorithm has a fast simulation in the sense that $\mathbb{P}(N >n) \leq C\rho^n$ - although being often impractible.
+
+
+## Huber's algorithms comparison
+```{r}
+# Prepare random seed
+set.seed(random_seed, kind="L'Ecuyer-CMRG")
+# Set up storing variables
+Huber_2019 <- vector("list", length = length(C_seq)*length(eps_seq)) #Save results
+df_Huber_2019 <- data.frame(p=numeric(), C=numeric(), eps=numeric(), n=numeric(), est_p=numeric(), est_num_tosses=numeric(), stringsAsFactors = F)
+Huber_2017 <- Huber_2019
+Huber_2013 <- Huber_2019
+df_Huber_2017 <- df_Huber_2019
+df_Huber_2013 <- df_Huber_2019
+counter <- 1
+for(C in C_seq) {
+  for(eps in eps_seq){
+    # Set the value of p
+    p <- (1-eps)/C
+    # Huber 2019
+    aux <- list_to_matrix(mclapply(1:n, function(iter) {
+      doubling_Huber_2019_iter(n=1,C=C,i=1,eps=eps,p=p)
+    },mc.cores = num_cores))
+    Huber_2019[[counter]] <- list(p=p,C=C,res=aux[1,],num_tosses=aux[2,])
+    df_Huber_2019[counter,] <- c(p,C,eps,n,mean(aux[1,]),mean(aux[2,]))
+    # Save result
+    saveRDS(list(Huber_2013=Huber_2013, Huber_2017=Huber_2017, Huber_2019=Huber_2019, 
+                 df_Huber_2013=df_Huber_2013, df_Huber_2017=df_Huber_2017, df_Huber_2019=df_Huber_2019),
+            paste0(getwd(),"Huber_comparison_",n,"_",num_cores,"_",random_seed,"_TEMP.rds"))
+    # Huber 2017
+    aux <- list_to_matrix(mclapply(1:n, function(iter) {
+      doubling_Huber_2017(n=1,C=C,eps=eps,p=p)
+    },mc.cores = num_cores))
+    Huber_2017[[counter]] <- list(p=p,C=C,res=aux[1,],num_tosses=aux[2,])
+    df_Huber_2017[counter,] <- c(p,C,eps,n,mean(aux[1,]),mean(aux[2,]))
+    saveRDS(list(Huber_2013=Huber_2013, Huber_2017=Huber_2017, Huber_2019=Huber_2019, 
+                 df_Huber_2013=df_Huber_2013, df_Huber_2017=df_Huber_2017, df_Huber_2019=df_Huber_2019),
+            paste0(getwd(),"Huber_comparison_",n,"_",num_cores,"_",random_seed,"_TEMP.rds"))
+    # Huber 2013
+    aux <- list_to_matrix(mclapply(1:n, function(iter) {
+      doubling_Huber_2014(n=1,C=C,eps=eps,p=p)
+    },mc.cores = num_cores))
+    Huber_2013[[counter]] <- list(p=p,C=C,res=aux[1,],num_tosses=aux[2,])
+    df_Huber_2013[counter,] <- c(p,C,eps,n,mean(aux[1,]),mean(aux[2,]))
+    saveRDS(list(Huber_2013=Huber_2013, Huber_2017=Huber_2017, Huber_2019=Huber_2019, 
+                 df_Huber_2013=df_Huber_2013, df_Huber_2017=df_Huber_2017, df_Huber_2019=df_Huber_2019),
+            paste0(getwd(),"Huber_comparison_",n,"_",num_cores,"_",random_seed,"_TEMP.rds"))
+    counter <- counter + 1
+  }
+}
+
+saveRDS(list(Huber_2013=Huber_2013, Huber_2017=Huber_2017, Huber_2019=Huber_2019, 
+                 df_Huber_2013=df_Huber_2013, df_Huber_2017=df_Huber_2017, df_Huber_2019=df_Huber_2019),
+            paste0(getwd(),"Huber_comparison_",n,"_",num_cores,"_",random_seed,".rds"))
+file.remove(paste0(getwd(),"Huber_comparison_",n,"_",num_cores,"_",random_seed,"_TEMP.rds"))
+```
+
+```{r}
+df_Huber_2019
+```
+
+
+
+
+
