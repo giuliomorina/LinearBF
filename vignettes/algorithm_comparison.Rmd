@@ -107,7 +107,62 @@ file.remove(paste0(getwd(),"Huber_comparison_",n,"_",num_cores,"_",random_seed,"
 ```
 
 ```{r}
-df_Huber_2019
+# Putting together results from different runs
+filenames <- paste0(getwd(),c("Huber_comparison_10000_2_17",
+               "Huber_comparison_10000_6_42",
+               "Huber_comparison_20000_6_11"),".rds")
+# Create function to merge together the lists
+merge_res_list <- function(res1,res2) {
+  if(length(res1) != length(res2)) {
+    stop("The two lists do not share the same length")
+  }
+  final_res <- vector("list", length=length(res1))
+  for(i in 1:length(res1)) {
+    l <- list(res1[[i]],res2[[i]])
+    keys <- unique(unlist(lapply(l, names)))
+    final_res[[i]] <- setNames(do.call(mapply, c(FUN=c, lapply(l, `[`, keys))), keys)
+    final_res[[i]]$p <- unique(final_res[[i]]$p)
+    final_res[[i]]$C <- unique(final_res[[i]]$C)
+  }
+  return(final_res)
+}
+construct_df <- function(l) {
+  df <- data.frame(p=numeric(), C=numeric(), eps=numeric(), n=numeric(), mean_p=numeric(), sd_num_tosses=numeric(), mean_num_tosses=numeric(), median_num_tosses=numeric(), stringsAsFactors = F)
+  counter <- 1
+  for(aux in l) {
+    df[counter,] <- c(aux$p,aux$C,1-aux$C*aux$p,length(aux$num_tosses),mean(aux$p),sd(aux$num_tosses),mean(aux$num_tosses),  median(aux$num_tosses))
+    counter <- counter+1
+  }
+  return(df)
+}
+# Prepare
+Huber_2019_all <- vector("list", length=0)
+Huber_2017_all <- vector("list", length=0)
+Huber_2013_all <- vector("list", length=0)
+# Merge results together
+for(name in filenames) {
+  if(!file.exists(name)) {stop("File name not found")}
+  res <- readRDS(name)
+  if(length(Huber_2019_all) == 0) {
+    Huber_2019_all <- res$Huber_2019
+  } else {
+    Huber_2019_all <- merge_res_list(Huber_2019_all, res$Huber_2019)
+  }
+  if(length(Huber_2017_all) == 0) {
+    Huber_2017_all <- res$Huber_2017
+  } else {
+    Huber_2017_all <- merge_res_list(Huber_2017_all, res$Huber_2017)
+  }
+  if(length(Huber_2013_all) == 0) {
+    Huber_2013_all <- res$Huber_2013
+  } else {
+    Huber_2013_all <- merge_res_list(Huber_2013_all, res$Huber_2013)
+  }
+}
+# Create dataframes
+df_Huber_2019_all <- construct_df(Huber_2019_all)
+df_Huber_2017_all <- construct_df(Huber_2017_all)
+df_Huber_2013_all <- construct_df(Huber_2013_all)
 ```
 
 
