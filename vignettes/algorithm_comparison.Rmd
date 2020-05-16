@@ -110,7 +110,8 @@ file.remove(paste0(getwd(),"Huber_comparison_",n,"_",num_cores,"_",random_seed,"
 # Putting together results from different runs
 filenames <- paste0(getwd(),c("Huber_comparison_10000_2_17",
                "Huber_comparison_10000_6_42",
-               "Huber_comparison_20000_6_11"),".rds")
+               "Huber_comparison_20000_6_11",
+               "Huber_comparison_60000_6_1991"),".rds")
 # Create function to merge together the lists
 merge_res_list <- function(res1,res2) {
   if(length(res1) != length(res2)) {
