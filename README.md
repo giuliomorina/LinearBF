@@ -1,1 +1,2 @@
-# DoublingBF
+# Linear BErnoulli Factory
+

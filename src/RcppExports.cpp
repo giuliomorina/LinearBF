@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // modified_double_func_cpp
 double modified_double_func_cpp(double p, double C, double eps);
-RcppExport SEXP _DoublingBF_modified_double_func_cpp(SEXP pSEXP, SEXP CSEXP, SEXP epsSEXP) {
+RcppExport SEXP _LinearBF_modified_double_func_cpp(SEXP pSEXP, SEXP CSEXP, SEXP epsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,7 +20,7 @@ END_RCPP
 }
 // doubling_Flegal_find_n0
 int doubling_Flegal_find_n0(const double eps, const double C);
-RcppExport SEXP _DoublingBF_doubling_Flegal_find_n0(SEXP epsSEXP, SEXP CSEXP) {
+RcppExport SEXP _LinearBF_doubling_Flegal_find_n0(SEXP epsSEXP, SEXP CSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -32,7 +32,7 @@ END_RCPP
 }
 // doubling_Flegal_Herbei_cpp
 Rcpp::List doubling_Flegal_Herbei_cpp(double p, const double eps, const double C, int n0, const int max_iter, const double verbose);
-RcppExport SEXP _DoublingBF_doubling_Flegal_Herbei_cpp(SEXP pSEXP, SEXP epsSEXP, SEXP CSEXP, SEXP n0SEXP, SEXP max_iterSEXP, SEXP verboseSEXP) {
+RcppExport SEXP _LinearBF_doubling_Flegal_Herbei_cpp(SEXP pSEXP, SEXP epsSEXP, SEXP CSEXP, SEXP n0SEXP, SEXP max_iterSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -48,7 +48,7 @@ END_RCPP
 }
 // doubling_Flegal_Morina_find_n0
 int doubling_Flegal_Morina_find_n0(const double eps, const double C);
-RcppExport SEXP _DoublingBF_doubling_Flegal_Morina_find_n0(SEXP epsSEXP, SEXP CSEXP) {
+RcppExport SEXP _LinearBF_doubling_Flegal_Morina_find_n0(SEXP epsSEXP, SEXP CSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -60,7 +60,7 @@ END_RCPP
 }
 // doubling_Flegal_Herbei_Morina_cpp
 Rcpp::List doubling_Flegal_Herbei_Morina_cpp(double p, const double eps, const double C, int n0, const int max_iter, const double verbose);
-RcppExport SEXP _DoublingBF_doubling_Flegal_Herbei_Morina_cpp(SEXP pSEXP, SEXP epsSEXP, SEXP CSEXP, SEXP n0SEXP, SEXP max_iterSEXP, SEXP verboseSEXP) {
+RcppExport SEXP _LinearBF_doubling_Flegal_Herbei_Morina_cpp(SEXP pSEXP, SEXP epsSEXP, SEXP CSEXP, SEXP n0SEXP, SEXP max_iterSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -76,7 +76,7 @@ END_RCPP
 }
 // logistic_cpp
 Rcpp::List logistic_cpp(float C, float p);
-RcppExport SEXP _DoublingBF_logistic_cpp(SEXP CSEXP, SEXP pSEXP) {
+RcppExport SEXP _LinearBF_logistic_cpp(SEXP CSEXP, SEXP pSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -88,7 +88,7 @@ END_RCPP
 }
 // doubling_Huber_2019_iter_cpp
 Rcpp::List doubling_Huber_2019_iter_cpp(float C, int i, float eps, float p);
-RcppExport SEXP _DoublingBF_doubling_Huber_2019_iter_cpp(SEXP CSEXP, SEXP iSEXP, SEXP epsSEXP, SEXP pSEXP) {
+RcppExport SEXP _LinearBF_doubling_Huber_2019_iter_cpp(SEXP CSEXP, SEXP iSEXP, SEXP epsSEXP, SEXP pSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -102,7 +102,7 @@ END_RCPP
 }
 // doubling_find_n0
 int doubling_find_n0(const double eps);
-RcppExport SEXP _DoublingBF_doubling_find_n0(SEXP epsSEXP) {
+RcppExport SEXP _LinearBF_doubling_find_n0(SEXP epsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -113,7 +113,7 @@ END_RCPP
 }
 // doubling_Nacu_Peres_cpp
 Rcpp::List doubling_Nacu_Peres_cpp(double p, const double eps, int n0, const int max_iter, const double verbose);
-RcppExport SEXP _DoublingBF_doubling_Nacu_Peres_cpp(SEXP pSEXP, SEXP epsSEXP, SEXP n0SEXP, SEXP max_iterSEXP, SEXP verboseSEXP) {
+RcppExport SEXP _LinearBF_doubling_Nacu_Peres_cpp(SEXP pSEXP, SEXP epsSEXP, SEXP n0SEXP, SEXP max_iterSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -128,19 +128,19 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_DoublingBF_modified_double_func_cpp", (DL_FUNC) &_DoublingBF_modified_double_func_cpp, 3},
-    {"_DoublingBF_doubling_Flegal_find_n0", (DL_FUNC) &_DoublingBF_doubling_Flegal_find_n0, 2},
-    {"_DoublingBF_doubling_Flegal_Herbei_cpp", (DL_FUNC) &_DoublingBF_doubling_Flegal_Herbei_cpp, 6},
-    {"_DoublingBF_doubling_Flegal_Morina_find_n0", (DL_FUNC) &_DoublingBF_doubling_Flegal_Morina_find_n0, 2},
-    {"_DoublingBF_doubling_Flegal_Herbei_Morina_cpp", (DL_FUNC) &_DoublingBF_doubling_Flegal_Herbei_Morina_cpp, 6},
-    {"_DoublingBF_logistic_cpp", (DL_FUNC) &_DoublingBF_logistic_cpp, 2},
-    {"_DoublingBF_doubling_Huber_2019_iter_cpp", (DL_FUNC) &_DoublingBF_doubling_Huber_2019_iter_cpp, 4},
-    {"_DoublingBF_doubling_find_n0", (DL_FUNC) &_DoublingBF_doubling_find_n0, 1},
-    {"_DoublingBF_doubling_Nacu_Peres_cpp", (DL_FUNC) &_DoublingBF_doubling_Nacu_Peres_cpp, 5},
+    {"_LinearBF_modified_double_func_cpp", (DL_FUNC) &_LinearBF_modified_double_func_cpp, 3},
+    {"_LinearBF_doubling_Flegal_find_n0", (DL_FUNC) &_LinearBF_doubling_Flegal_find_n0, 2},
+    {"_LinearBF_doubling_Flegal_Herbei_cpp", (DL_FUNC) &_LinearBF_doubling_Flegal_Herbei_cpp, 6},
+    {"_LinearBF_doubling_Flegal_Morina_find_n0", (DL_FUNC) &_LinearBF_doubling_Flegal_Morina_find_n0, 2},
+    {"_LinearBF_doubling_Flegal_Herbei_Morina_cpp", (DL_FUNC) &_LinearBF_doubling_Flegal_Herbei_Morina_cpp, 6},
+    {"_LinearBF_logistic_cpp", (DL_FUNC) &_LinearBF_logistic_cpp, 2},
+    {"_LinearBF_doubling_Huber_2019_iter_cpp", (DL_FUNC) &_LinearBF_doubling_Huber_2019_iter_cpp, 4},
+    {"_LinearBF_doubling_find_n0", (DL_FUNC) &_LinearBF_doubling_find_n0, 1},
+    {"_LinearBF_doubling_Nacu_Peres_cpp", (DL_FUNC) &_LinearBF_doubling_Nacu_Peres_cpp, 5},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_DoublingBF(DllInfo *dll) {
+RcppExport void R_init_LinearBF(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

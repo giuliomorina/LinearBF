@@ -2,38 +2,38 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 modified_double_func_cpp <- function(p, C, eps) {
-    .Call(`_DoublingBF_modified_double_func_cpp`, p, C, eps)
+    .Call(`_LinearBF_modified_double_func_cpp`, p, C, eps)
 }
 
 doubling_Flegal_find_n0 <- function(eps, C) {
-    .Call(`_DoublingBF_doubling_Flegal_find_n0`, eps, C)
+    .Call(`_LinearBF_doubling_Flegal_find_n0`, eps, C)
 }
 
 doubling_Flegal_Herbei_cpp <- function(p, eps, C, n0 = -1L, max_iter = -1L, verbose = FALSE) {
-    .Call(`_DoublingBF_doubling_Flegal_Herbei_cpp`, p, eps, C, n0, max_iter, verbose)
+    .Call(`_LinearBF_doubling_Flegal_Herbei_cpp`, p, eps, C, n0, max_iter, verbose)
 }
 
 doubling_Flegal_Morina_find_n0 <- function(eps, C) {
-    .Call(`_DoublingBF_doubling_Flegal_Morina_find_n0`, eps, C)
+    .Call(`_LinearBF_doubling_Flegal_Morina_find_n0`, eps, C)
 }
 
 doubling_Flegal_Herbei_Morina_cpp <- function(p, eps, C, n0 = -1L, max_iter = -1L, verbose = FALSE) {
-    .Call(`_DoublingBF_doubling_Flegal_Herbei_Morina_cpp`, p, eps, C, n0, max_iter, verbose)
+    .Call(`_LinearBF_doubling_Flegal_Herbei_Morina_cpp`, p, eps, C, n0, max_iter, verbose)
 }
 
 logistic_cpp <- function(C, p) {
-    .Call(`_DoublingBF_logistic_cpp`, C, p)
+    .Call(`_LinearBF_logistic_cpp`, C, p)
 }
 
 doubling_Huber_2019_iter_cpp <- function(C, i, eps, p) {
-    .Call(`_DoublingBF_doubling_Huber_2019_iter_cpp`, C, i, eps, p)
+    .Call(`_LinearBF_doubling_Huber_2019_iter_cpp`, C, i, eps, p)
 }
 
 doubling_find_n0 <- function(eps) {
-    .Call(`_DoublingBF_doubling_find_n0`, eps)
+    .Call(`_LinearBF_doubling_find_n0`, eps)
 }
 
 doubling_Nacu_Peres_cpp <- function(p, eps, n0 = -1L, max_iter = -1L, verbose = FALSE) {
-    .Call(`_DoublingBF_doubling_Nacu_Peres_cpp`, p, eps, n0, max_iter, verbose)
+    .Call(`_LinearBF_doubling_Nacu_Peres_cpp`, p, eps, n0, max_iter, verbose)
 }
 

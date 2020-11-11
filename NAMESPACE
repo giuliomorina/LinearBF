@@ -1,3 +1,3 @@
-useDynLib(DoublingBF, .registration=TRUE)
+useDynLib(LinearBF, .registration=TRUE)
 exportPattern("^[[:alpha:]]+")
 importFrom(Rcpp, evalCpp)

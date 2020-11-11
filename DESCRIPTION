@@ -1,11 +1,11 @@
-Package: DoublingBF
+Package: LinearBF
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
+Title: Algorithms for Linear Bernoulli Factories
 Version: 1.0
-Date: 2020-04-10
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: One paragraph description of what the package does as one or more full sentences.
+Date: 2020-11-11
+Author: Giulio Morina
+Maintainer: Giulio Morina <G.Morina@warwick.ac.uk>
+Description: This package provides several algorithms that implement a linear Bernoulli Factory.
 License: GPL (>= 2)
 Imports: Rcpp (>= 1.0.4)
 LinkingTo: Rcpp
