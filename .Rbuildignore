@@ -1,2 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+<<<<<<< HEAD
+=======
+^DoublingBF\.Rcheck$
+^DoublingBF.*\.tar\.gz$
+^DoublingBF.*\.tgz$
+>>>>>>> 8f059bcfc91c1a1f9f0fd66f57d2f8b819d32e6f

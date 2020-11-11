@@ -40,3 +40,4 @@ vignettes/*.pdf
 DoublingBF.Rcheck/
 DoublingBF*.tar.gz
 DoublingBF*.tgz
+inst/doc
