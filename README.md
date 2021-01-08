@@ -1,4 +1,4 @@
-This repository contains code for the content of Chapter 1 of the PhD thesis "Extending the Bernoulli Factory to a Dice Enterprise".
+This repository contains code for the content of Chapter 2 of the PhD thesis "Extending the Bernoulli Factory to a Dice Enterprise".
 
 ## Linear Bernoulli Factory
 
@@ -6,7 +6,7 @@ Given a coin that lands head with probability <img src="https://render.githubuse
 
 Several linear Bernoulli Factories are implemented, in particular:
 
-- `doubling_Nacu_Peres' implements via `Rcpp' the doubling algorithm proposed by Nacu and Peres (2005).
+- `doubling_Nacu_Peres` implements via `Rcpp` the doubling algorithm proposed by Nacu and Peres (2005).
 - `doubling_Flegal_Herbei` implements the linear Bernoulli Factory proposed by Flegal and Herbei (2012).
 - `doubling_Huber_2016` implements the linear Bernoulli Factory proposed by Huber (2016).
 - `doubling_Huber_2017` and `small_doubling_Huber_2017` implement the linear Bernoulli Factory algorithms proposed by Huber (2017). The latter further assumes $M < 1/2$.
