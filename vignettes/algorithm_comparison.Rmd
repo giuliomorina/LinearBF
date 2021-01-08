@@ -87,7 +87,7 @@ for(C in C_seq) {
             paste0(getwd(),"/","Huber_comparison_",n,"_",num_cores,"_",random_seed,"_TEMP.rds"))
     # Huber 2013
     aux <- list_to_matrix(mclapply(1:n, function(iter) {
-      doubling_Huber_2014(n=1,C=C,eps=eps,p=p)
+      doubling_Huber_2016(n=1,C=C,eps=eps,p=p)
     },mc.cores = num_cores))
     Huber_2013[[counter]] <- list(p=p,C=C,res=aux[1,],num_tosses=aux[2,])
     df_Huber_2013[counter,] <- c(p,C,eps,n,mean(aux[1,]),mean(aux[2,]))

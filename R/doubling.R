@@ -248,10 +248,10 @@ small_doubling_Huber_2017 <- function(n, C, M, p, as_list=F, doubling_bf=doublin
   }
 }
 
-doubling_Huber_2014 <- function(n, C, eps, p, as_list=F) {
+doubling_Huber_2016 <- function(n, C, eps, p, as_list=F) {
   # f(p) = Cp, for Cp < 1-eps
   # The function is taken from "Nearly optimal Bernoulli factories for 
-  # linear functions" by M. Huber (2014).
+  # linear functions" by M. Huber (2016).
   res_list <- lapply(1:n, function(iter) {
     num_tosses <- 0
     gamma <- 0.5
